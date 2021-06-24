@@ -1,8 +1,8 @@
-import React, {Suspense} from "react";
+import React, {Suspense, useRef} from "react";
 import "./App.scss";
 
 //Components
-import { Canvas} from "@react-three/fiber";
+import { Canvas, useFrame} from "@react-three/fiber";
 import Header from "./components/header";
 import {Section} from "./components/section"
 import { Html} from "@react-three/drei";
@@ -16,10 +16,14 @@ const Model = () => {
 }
 
 const HTMLContent = () => {
+
+  const ref = useRef();
+  useFrame(() => (ref.current.rotation.y += 0.01))
+
   return (
     <Section factor={1.5} offset={1}>
       <group position={[0, 250, 0]}>
-        <mesh position={[0, -35, 0]}>
+        <mesh ref={ref} position={[0, -35, 0]}>
           <Model/>
         </mesh>
         <Html fullscreen>
@@ -32,11 +36,23 @@ const HTMLContent = () => {
   );
 }
 
+const Lights = () => {
+  return (
+    <>
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <directionalLight position={[0, 10, 0]} intensity={1.5} />
+      <spotLight position={[1000, 0, 0]} intensity={1} />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <>
       <Header />
       <Canvas colorManagement camera={{ position: [0, 0, 120], fov: 70 }}>
+        <Lights/>
         <Suspense fallback={null}>
           <HTMLContent />
         </Suspense>
